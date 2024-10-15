@@ -9,13 +9,12 @@ import {
 	CardBody,
 	CardFooter,
 	CardHeader,
-	Divider,
 	Input,
 	Link
 } from '@nextui-org/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -38,6 +37,21 @@ export const LoginForm = () => {
 	const [authError, setAuthError] = useState<string | null>(null)
 	const queryClient = useQueryClient()
 	const { push } = useRouter()
+
+	useEffect(() => {
+		const params = new URLSearchParams(location.search)
+		if (params.get('auth') === 'true') {
+			setLoading(true)
+		}
+	}, [location])
+
+	const handleLogin = () => {
+		const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
+
+		const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email`
+
+		window.location.href = githubAuthUrl
+	}
 
 	const { mutate } = useMutation({
 		mutationKey: ['login'],
@@ -70,6 +84,7 @@ export const LoginForm = () => {
 					<h2 className='text-2xl font-semibold'>Войти в аккаунт</h2>
 				</CardHeader>
 				<CardBody className='space-y-4'>
+					{authError && <p className='text-danger-600'>{authError}</p>}
 					<div className='flex flex-col gap-2'>
 						<Button
 							startContent={
@@ -86,9 +101,10 @@ export const LoginForm = () => {
 							startContent={<Yandex />}
 							variant='bordered'
 						>
-							Войти через
+							Войти через Яндекс
 						</Button>
 						<Button
+							onClick={handleLogin}
 							startContent={
 								<Github
 									width='25'
@@ -97,7 +113,7 @@ export const LoginForm = () => {
 							}
 							variant='bordered'
 						>
-							Войти через
+							Войти через Github
 						</Button>
 					</div>
 					<div className='flex flex-col gap-1'>
@@ -140,15 +156,9 @@ export const LoginForm = () => {
 						</form>
 					</div>
 				</CardBody>
-				<Divider />
-				<CardFooter>
-					<Link
-						isExternal
-						showAnchorIcon
-						href='https://github.com/nextui-org/nextui'
-					>
-						Visit source code on GitHub.
-					</Link>
+				<CardFooter className='space-x-2 justify-center'>
+					<p>Нет аккаунта?</p>
+					<Link href='/register'>Создать</Link>
 				</CardFooter>
 			</Card>
 		</div>
