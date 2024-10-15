@@ -39,6 +39,13 @@ export const RegisterForm = () => {
 	const queryClient = useQueryClient()
 	const { push } = useRouter()
 
+	const handleLogin = () => {
+		const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
+
+		const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email`
+
+		window.location.href = githubAuthUrl
+	}
 	const { mutate } = useMutation({
 		mutationKey: ['register'],
 		mutationFn: (data: IAuthForm) => authService.register(data),
@@ -70,6 +77,7 @@ export const RegisterForm = () => {
 					<h2 className='text-2xl font-semibold'>Cоздать аккаунт</h2>
 				</CardHeader>
 				<CardBody className='space-y-4'>
+					{authError && <p className='text-danger-600'>{authError}</p>}
 					<div className='flex flex-col gap-2'>
 						<Button
 							startContent={
@@ -86,9 +94,10 @@ export const RegisterForm = () => {
 							startContent={<Yandex />}
 							variant='bordered'
 						>
-							Продолжить через
+							Продолжить через Яндекс
 						</Button>
 						<Button
+							onClick={handleLogin}
 							startContent={
 								<Github
 									width='25'
@@ -97,7 +106,7 @@ export const RegisterForm = () => {
 							}
 							variant='bordered'
 						>
-							Продолжить через
+							Продолжить через Github
 						</Button>
 					</div>
 					<div className='flex flex-col gap-1'>
@@ -135,20 +144,15 @@ export const RegisterForm = () => {
 								size='md'
 								isLoading={loading}
 							>
-								Войти
+								Зарегистрироваться
 							</Button>
 						</form>
 					</div>
 				</CardBody>
 				<Divider />
-				<CardFooter>
-					<Link
-						isExternal
-						showAnchorIcon
-						href='https://github.com/nextui-org/nextui'
-					>
-						Visit source code on GitHub.
-					</Link>
+				<CardFooter className='space-x-2 justify-center'>
+					<p>Уже есть аккаунт?</p>
+					<Link href='/login'>Войти</Link>
 				</CardFooter>
 			</Card>
 		</div>

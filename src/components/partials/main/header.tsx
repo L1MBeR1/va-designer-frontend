@@ -30,7 +30,7 @@ export function Header() {
 				content: '!p-0'
 			}}
 		>
-			<div className='grid grid-cols-3 items-center w-full'>
+			<div className='w-full flex flex-row justify-between items-center'>
 				<NavbarContent>
 					<NavbarBrand
 						className='cursor-pointer'
@@ -41,8 +41,6 @@ export function Header() {
 						LOGO
 					</NavbarBrand>
 				</NavbarContent>
-
-				<NavbarContent className='hidden md:flex gap-6 justify-start font-semibold'></NavbarContent>
 
 				<NavbarContent justify='end'>
 					<NavbarItem>
