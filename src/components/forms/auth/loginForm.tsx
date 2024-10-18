@@ -14,7 +14,7 @@ import {
 } from '@nextui-org/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
@@ -37,13 +37,6 @@ export const LoginForm = () => {
 	const [authError, setAuthError] = useState<string | null>(null)
 	const queryClient = useQueryClient()
 	const { push } = useRouter()
-
-	useEffect(() => {
-		const params = new URLSearchParams(location.search)
-		if (params.get('auth') === 'true') {
-			setLoading(true)
-		}
-	}, [location])
 
 	const handleLogin = () => {
 		const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
