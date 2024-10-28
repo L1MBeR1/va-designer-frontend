@@ -14,6 +14,17 @@ export const authService = {
 
 		return response
 	},
+	async oauth(code: string, provider: string) {
+		const response = await axiosClassic.get<IAuthResponse>(
+			`/auth/oauth/${provider}?code=${code}`
+		)
+		console.log(response)
+		if (response.data.accessToken) {
+			saveTokenStorage(response.data.accessToken)
+		}
+
+		return response
+	},
 
 	async register(data: IAuthForm) {
 		const response = await axiosClassic.post<IAuthResponse>(

@@ -1,8 +1,5 @@
 'use client'
 
-import Github from '/public/svgs/githubLogo.svg'
-import VK from '/public/svgs/vkLogo.svg'
-import Yandex from '/public/svgs/yandexLogo.svg'
 import {
 	Button,
 	Card,
@@ -10,17 +7,26 @@ import {
 	CardFooter,
 	CardHeader,
 	Input,
-	Link
+	Link,
+	Spinner
 } from '@nextui-org/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { GithubButton } from '@/components/buttons/auth/githubButton'
+import { VkButton } from '@/components/buttons/auth/vkButton'
+import { YandexButton } from '@/components/buttons/auth/yandexButton'
 import { PasswordField } from '@/components/fields/passwordField'
 
-import { IAuthForm } from '@/types/auth.types'
+import {
+	EnumAuthType,
+	IAuthForm,
+	OAuthErrorCodes,
+	OAuthErrorMessages
+} from '@/types/auth.types'
 
 import { APP_PAGES } from '@/config/pages-url.config'
 
@@ -34,24 +40,34 @@ export const LoginForm = () => {
 		formState: { errors }
 	} = useForm<IAuthForm>()
 	const [loading, setLoading] = useState(false)
-	const [authError, setAuthError] = useState<string | null>(null)
+	const [formLoading, setFormLoading] = useState(false)
+	const [error, setError] = useState<string | null>(null)
 	const queryClient = useQueryClient()
+	const searchParams = useSearchParams()
 	const { push } = useRouter()
 
-	const handleLogin = () => {
-		const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
+	useEffect(() => {
+		const errorUrl = searchParams.get('error')
+		const loadingUrl = searchParams.get('redirect')
 
-		const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email`
+		if (loadingUrl) setFormLoading(true)
 
-		window.location.href = githubAuthUrl
-	}
+		if (
+			errorUrl &&
+			Object.values(OAuthErrorCodes).includes(errorUrl as OAuthErrorCodes)
+		) {
+			setError(OAuthErrorMessages[errorUrl as OAuthErrorCodes])
+		} else {
+			setError(null)
+		}
+	}, [searchParams])
 
 	const { mutate } = useMutation({
 		mutationKey: ['login'],
 		mutationFn: (data: IAuthForm) => authService.login(data),
 		onMutate() {
 			setLoading(true)
-			setAuthError(null)
+			setError(null)
 		},
 		onSuccess() {
 			queryClient.refetchQueries({ queryKey: ['profile'], type: 'active' })
@@ -60,7 +76,7 @@ export const LoginForm = () => {
 			push(APP_PAGES.DASHBOARD.HOME)
 		},
 		onError(error: any) {
-			setAuthError('Ошибка при входе. Проверьте данные.')
+			setError('Ошибка при входе. Проверьте данные.')
 		},
 		onSettled() {
 			setLoading(false)
@@ -70,90 +86,74 @@ export const LoginForm = () => {
 	const onSubmit: SubmitHandler<IAuthForm> = data => {
 		mutate(data)
 	}
+
 	return (
 		<div className='w-fit h-fit '>
-			<Card className='p-4 w-[400px]'>
-				<CardHeader className='flex gap-3 justify-center'>
-					<h2 className='text-2xl font-semibold'>Войти в аккаунт</h2>
-				</CardHeader>
-				<CardBody className='space-y-4'>
-					{authError && <p className='text-danger-600'>{authError}</p>}
-					<div className='flex flex-col gap-2'>
-						<Button
-							startContent={
-								<VK
-									width='25'
-									height='25'
-								/>
-							}
-							variant='bordered'
-						>
-							Войти через Vk
-						</Button>
-						<Button
-							startContent={<Yandex />}
-							variant='bordered'
-						>
-							Войти через Яндекс
-						</Button>
-						<Button
-							onClick={handleLogin}
-							startContent={
-								<Github
-									width='25'
-									height='25'
-								/>
-							}
-							variant='bordered'
-						>
-							Войти через Github
-						</Button>
-					</div>
-					<div className='flex flex-col gap-1'>
-						<form
-							className='flex flex-col gap-3'
-							onSubmit={handleSubmit(onSubmit)}
-						>
-							<Input
-								label='Почта'
-								size={'md'}
-								variant={'bordered'}
-								isInvalid={!!errors.email}
-								{...register('email', { required: 'Почта обязательна' })}
+			{formLoading ? (
+				<Spinner />
+			) : (
+				<Card className='p-4 w-[400px]'>
+					<CardHeader className='flex gap-3 justify-center'>
+						<h2 className='text-2xl font-semibold'>Войти в аккаунт</h2>
+					</CardHeader>
+					<CardBody className='space-y-4'>
+						{error && <p className='text-danger-600'>{error}</p>}
+						<div className='flex flex-col gap-2'>
+							<VkButton label='Войти через Vk' />
+							<YandexButton
+								label='Войти через Yandex'
+								purpose={EnumAuthType.login}
 							/>
-
-							<PasswordField
-								label='Пароль'
-								register={register}
-								registerName='password'
-								size={'md'}
-								variant={'bordered'}
-								isInvalid={!!errors.password}
-								rules={{
-									required: 'Пароль обязателен',
-									minLength: {
-										value: 6,
-										message: 'Пароль должен содержать минимум 6 символов'
-									}
-								}}
+							<GithubButton
+								label='Войти через Github'
+								purpose={EnumAuthType.login}
 							/>
-							<Button
-								className='full'
-								color='primary'
-								type='submit'
-								size='md'
-								isLoading={loading}
+						</div>
+						<div className='flex flex-col gap-1'>
+							<form
+								className='flex flex-col gap-3'
+								onSubmit={handleSubmit(onSubmit)}
 							>
-								Войти
-							</Button>
-						</form>
-					</div>
-				</CardBody>
-				<CardFooter className='space-x-2 justify-center'>
-					<p>Нет аккаунта?</p>
-					<Link href='/register'>Создать</Link>
-				</CardFooter>
-			</Card>
+								<Input
+									label='Почта'
+									size={'md'}
+									variant={'bordered'}
+									isInvalid={!!errors.email}
+									{...register('email', { required: 'Почта обязательна' })}
+								/>
+								<PasswordField
+									label='Пароль'
+									register={register}
+									registerName='password'
+									size={'md'}
+									variant={'bordered'}
+									isInvalid={!!errors.password}
+									rules={{
+										required: 'Пароль обязателен',
+										minLength: {
+											value: 6,
+											message: 'Пароль должен содержать минимум 6 символов'
+										}
+									}}
+								/>
+								<Button
+									className='full'
+									color='primary'
+									type='submit'
+									size='md'
+									isLoading={loading}
+								>
+									Войти
+								</Button>
+							</form>
+						</div>
+					</CardBody>
+					<CardFooter className='space-x-2 justify-center'>
+						<p>Нет аккаунта?</p>
+						<Link href='/register'>Создать</Link>
+					</CardFooter>
+				</Card>
+			)}
 		</div>
 	)
 }

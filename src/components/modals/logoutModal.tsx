@@ -35,13 +35,14 @@ const LogoutModal = ({ isOpen, onOpenChange }: ILogoutModalProps) => {
 			setLogoutError(null)
 		},
 		onSuccess() {
-			toast.success('Успешный выход из аккаунта!')
-			push(APP_PAGES.HOME)
 			queryClient.removeQueries({ queryKey: ['profile'] })
+			push(APP_PAGES.HOME)
+			toast.success('Успешный выход из аккаунта!')
 		},
 		onError() {
 			setLogoutError('Ошибка при выходе. Попробуйте снова.')
 		},
+
 		onSettled() {
 			setLoading(false)
 		}
@@ -67,6 +68,7 @@ const LogoutModal = ({ isOpen, onOpenChange }: ILogoutModalProps) => {
 								variant='light'
 								size='lg'
 								onPress={onClose}
+								disabled={loading}
 							>
 								Назад
 							</Button>
@@ -77,6 +79,7 @@ const LogoutModal = ({ isOpen, onOpenChange }: ILogoutModalProps) => {
 									handleLogout()
 								}}
 								size='lg'
+								isLoading={loading}
 							>
 								Выйти
 							</Button>
