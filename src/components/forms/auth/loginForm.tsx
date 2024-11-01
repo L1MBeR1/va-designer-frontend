@@ -99,7 +99,10 @@ export const LoginForm = () => {
 					<CardBody className='space-y-4'>
 						{error && <p className='text-danger-600'>{error}</p>}
 						<div className='flex flex-col gap-2'>
-							<VkButton label='Войти через Vk' />
+							<VkButton
+								label='Войти через Vk'
+								purpose={EnumAuthType.login}
+							/>
 							<YandexButton
 								label='Войти через Yandex'
 								purpose={EnumAuthType.login}

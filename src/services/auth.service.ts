@@ -1,4 +1,4 @@
-import { IAuthForm, IAuthResponse } from '@/types/auth.types'
+import { IAuthForm, IAuthResponse, IOAuth } from '@/types/auth.types'
 
 import { axiosClassic } from '@/api/interceptors'
 
@@ -14,9 +14,9 @@ export const authService = {
 
 		return response
 	},
-	async oauth(code: string, provider: string) {
+	async oauth(data: IOAuth) {
 		const response = await axiosClassic.get<IAuthResponse>(
-			`/auth/oauth/${provider}?code=${code}`
+			`/auth/oauth/${data.provider}?code=${data.code}&deviceId=${data.deviceId}&codeVerifier=${data.codeVerifier}`
 		)
 		console.log(response)
 		if (response.data.accessToken) {

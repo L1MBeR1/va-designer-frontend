@@ -2,8 +2,10 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
+
+import { IOAuth } from '@/types/auth.types'
 
 import { APP_PAGES } from '@/config/pages-url.config'
 
@@ -14,21 +16,22 @@ export default function CallBack() {
 	const searchParams = useSearchParams()
 	const purposeRef = useRef<string | null>(null)
 	const providerRef = useRef<string | null>(null)
-	const [hasMutated, setHasMutated] = useState(false)
+	const deviceIdRef = useRef<string | null>(null)
+	const CodeVerifierRef = useRef<string | null>(null)
 
 	const handleOAuthError = useCallback(() => {
 		if (purposeRef.current) {
-			push(`/${purposeRef.current}?error="service_error"`)
+			push(`/${purposeRef.current}?error=service_error`)
 		}
 	}, [push])
 
 	const { mutate } = useMutation({
 		mutationKey: ['oauth'],
-		mutationFn: ({ code, provider }: { code: string; provider: string }) =>
-			authService.oauth(code, provider),
+		mutationFn: (data: IOAuth) => authService.oauth(data),
 		onSuccess() {
 			localStorage.removeItem(`oauth_state`)
 			localStorage.removeItem(`oauth_purpose`)
+			localStorage.removeItem(`oauth_code_verifier`)
 			push(APP_PAGES.DASHBOARD.HOME)
 			toast.success('Успешный вход в аккаунт!')
 		},
@@ -42,9 +45,11 @@ export default function CallBack() {
 		const state = searchParams.get('state')
 		const provider = searchParams.get('provider')
 		const error = searchParams.get('error')
+		const deviceId = searchParams.get('device_id')
 
 		const storedState = localStorage.getItem(`oauth_state`)
 		const storedPurpose = localStorage.getItem(`oauth_purpose`)
+		const storedCodeVerifier = localStorage.getItem(`oauth_code_verifier`)
 
 		purposeRef.current = storedPurpose
 
@@ -60,18 +65,24 @@ export default function CallBack() {
 
 		if (state !== storedState) {
 			console.error('State mismatch, possible CSRF attack!')
-			push(`/${purposeRef.current}?error="state_error"`)
+			push(`/${purposeRef.current}?error=state_error`)
 			return
 		}
 
-		if (typeof code === 'string' && !hasMutated) {
-			setHasMutated(true)
+		if (typeof code === 'string') {
 			providerRef.current = provider
-			mutate({ code, provider })
+			deviceIdRef.current = deviceId
+			CodeVerifierRef.current = storedCodeVerifier
+			mutate({
+				code,
+				provider,
+				deviceId,
+				codeVerifier: storedCodeVerifier
+			})
 
 			push(`/${storedPurpose}?redirect=true`)
 		}
-	}, [searchParams, mutate, push, hasMutated])
+	}, [searchParams, mutate, push])
 
 	return (
 		<main className='flex w-screen h-screen items-center justify-center'></main>

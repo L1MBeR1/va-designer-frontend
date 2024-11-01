@@ -21,6 +21,9 @@ export interface IAuthResponse {
 
 export interface IOAuth {
 	code: string | string[]
+	provider: string | string[]
+	deviceId?: string | string[] | null
+	codeVerifier?: string | string[] | null
 }
 
 export enum EnumAuthType {

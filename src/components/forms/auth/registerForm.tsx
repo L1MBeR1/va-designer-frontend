@@ -74,7 +74,7 @@ export const RegisterForm = () => {
 		<div className='w-fit h-fit '>
 			<Card className='p-4 w-[400px]'>
 				<CardHeader className='flex gap-3 justify-center'>
-					<h2 className='text-2xl font-semibold'>Cоздать аккаунт</h2>
+					<h2 className='text-2xl font-semibold'>Создать аккаунт</h2>
 				</CardHeader>
 				<CardBody className='space-y-4'>
 					{authError && <p className='text-danger-600'>{authError}</p>}
