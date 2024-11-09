@@ -26,6 +26,12 @@ export interface IOAuth {
 	codeVerifier?: string | string[] | null
 }
 
+export interface IPKCEResponse {
+	codeVerifier: string
+	codeChallenge: string
+	state: string
+}
+
 export enum EnumAuthType {
 	login = 'login',
 	register = 'register'

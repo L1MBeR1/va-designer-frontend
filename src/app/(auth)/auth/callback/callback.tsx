@@ -29,9 +29,9 @@ export default function CallBack() {
 		mutationKey: ['oauth'],
 		mutationFn: (data: IOAuth) => authService.oauth(data),
 		onSuccess() {
-			localStorage.removeItem(`oauth_state`)
-			localStorage.removeItem(`oauth_purpose`)
-			localStorage.removeItem(`oauth_code_verifier`)
+			sessionStorage.removeItem(`oauth_state`)
+			sessionStorage.removeItem(`oauth_purpose`)
+			sessionStorage.removeItem(`oauth_code_verifier`)
 			push(APP_PAGES.DASHBOARD.HOME)
 			toast.success('Успешный вход в аккаунт!')
 		},
@@ -47,9 +47,9 @@ export default function CallBack() {
 		const error = searchParams.get('error')
 		const deviceId = searchParams.get('device_id')
 
-		const storedState = localStorage.getItem(`oauth_state`)
-		const storedPurpose = localStorage.getItem(`oauth_purpose`)
-		const storedCodeVerifier = localStorage.getItem(`oauth_code_verifier`)
+		const storedState = sessionStorage.getItem(`oauth_state`)
+		const storedPurpose = sessionStorage.getItem(`oauth_purpose`)
+		const storedCodeVerifier = sessionStorage.getItem(`oauth_code_verifier`)
 
 		purposeRef.current = storedPurpose
 

@@ -1,4 +1,9 @@
-import { IAuthForm, IAuthResponse, IOAuth } from '@/types/auth.types'
+import {
+	IAuthForm,
+	IAuthResponse,
+	IOAuth,
+	IPKCEResponse
+} from '@/types/auth.types'
 
 import { axiosClassic } from '@/api/interceptors'
 
@@ -26,12 +31,16 @@ export const authService = {
 		return response
 	},
 
+	async pkce() {
+		const response = await axiosClassic.post<IPKCEResponse>('/auth/pkce')
+		return response
+	},
+
 	async register(data: IAuthForm) {
 		const response = await axiosClassic.post<IAuthResponse>(
 			'/auth/register',
 			data
 		)
-		console.log(response)
 		if (response.data.accessToken) {
 			saveTokenStorage(response.data.accessToken)
 		}

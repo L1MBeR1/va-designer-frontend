@@ -1,41 +1,49 @@
 import VK from '/public/svgs/vkLogo.svg'
 import { Button } from '@nextui-org/react'
+import { useMutation } from '@tanstack/react-query'
 
 import { EnumAuthProviders, EnumAuthType } from '@/types/auth.types'
 
-import { generateState } from '@/utils/auth/generateState'
-import {
-	generateCodeChallenge,
-	generateCodeVerifier
-} from '@/utils/auth/pkceUtils'
+import { authService } from '@/services/auth.service'
 
-interface IGithubButtonProps {
+interface IVkButtonProps {
 	label: string
 	purpose: EnumAuthType
 }
 
-export const VkButton = ({ label, purpose }: IGithubButtonProps) => {
-	const handleLoginGitHub = async () => {
-		const clientId = process.env.NEXT_PUBLIC_VK_CLIENT_ID
-		const state = generateState(128)
+export const VkButton = ({ label, purpose }: IVkButtonProps) => {
+	const { mutate } = useMutation({
+		mutationKey: ['pkce'],
+		mutationFn: () => authService.pkce(),
+		onMutate() {
+			// setLoading(true)
+		},
+		onSuccess(response) {
+			const { state, codeVerifier, codeChallenge } = response.data
 
-		const codeVerifier = generateCodeVerifier()
-		localStorage.setItem('oauth_code_verifier', codeVerifier)
-		const codeChallenge = await generateCodeChallenge(codeVerifier)
+			sessionStorage.setItem('oauth_code_verifier', codeVerifier)
+			sessionStorage.setItem('oauth_state', state)
+			sessionStorage.setItem('oauth_purpose', purpose)
 
-		localStorage.setItem('oauth_state', state)
-		localStorage.setItem('oauth_purpose', purpose)
+			const redirectUri = encodeURIComponent(
+				`${process.env.NEXT_PUBLIC_FRONT_END_URL}/auth/callback?provider=${EnumAuthProviders.vk}`
+			)
+			const clientId = process.env.NEXT_PUBLIC_VK_CLIENT_ID
 
-		const redirectUri = encodeURIComponent(
-			`${process.env.NEXT_PUBLIC_FRONT_END_URL}/auth/callback?provider=${EnumAuthProviders.vk}`
-		)
+			const url = `https://id.vk.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=email`
+			window.location.href = url
+		},
+		onSettled() {
+			// setLoading(false)
+		}
+	})
 
-		const vkAuthUrl = `https://id.vk.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=email`
-		window.location.href = vkAuthUrl
+	const handleLoginVk = async () => {
+		mutate()
 	}
 	return (
 		<Button
-			onClick={handleLoginGitHub}
+			onClick={handleLoginVk}
 			startContent={
 				<VK
 					width='25'
