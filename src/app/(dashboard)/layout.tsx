@@ -9,7 +9,7 @@ export default function ProfileLayout({
 }>) {
 	return (
 		<div
-			className={`${dashboardPadding} flex flex-row gap-5 w-screen h-screen`}
+			className={`${dashboardPadding} flex flex-row gap-5 w-screen h-screen main`}
 		>
 			<DashBoardSideBar />
 			{children}

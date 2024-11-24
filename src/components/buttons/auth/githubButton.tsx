@@ -42,6 +42,8 @@ export const GithubButton = ({ label, purpose }: IGithubButtonProps) => {
 	}
 	return (
 		<Button
+			radius='full'
+			className='font-medium'
 			onClick={handleLoginGitHub}
 			startContent={
 				<Github

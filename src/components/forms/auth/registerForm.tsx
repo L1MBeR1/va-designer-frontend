@@ -72,13 +72,16 @@ export const RegisterForm = () => {
 	}
 	return (
 		<div className='w-fit h-fit '>
-			<Card className='p-4 w-[400px]'>
+			<Card
+				className='p-6 w-[450px] rounded-2xl'
+				shadow='sm'
+			>
 				<CardHeader className='flex gap-3 justify-center'>
 					<h2 className='text-2xl font-semibold'>Создать аккаунт</h2>
 				</CardHeader>
-				<CardBody className='space-y-4'>
+				<CardBody className='space-y-6'>
 					{authError && <p className='text-danger-600'>{authError}</p>}
-					<div className='flex flex-col gap-2'>
+					<div className='flex flex-col gap-3'>
 						<Button
 							startContent={
 								<VK
@@ -88,7 +91,7 @@ export const RegisterForm = () => {
 							}
 							variant='bordered'
 						>
-							Продолжить через Vk
+							Продолжить через Вконтакте
 						</Button>
 						<Button
 							startContent={<Yandex />}
@@ -109,6 +112,7 @@ export const RegisterForm = () => {
 							Продолжить через Github
 						</Button>
 					</div>
+					<Divider />
 					<div className='flex flex-col gap-1'>
 						<form
 							className='flex flex-col gap-3'
@@ -116,7 +120,7 @@ export const RegisterForm = () => {
 						>
 							<Input
 								label='Почта'
-								size={'md'}
+								size={'lg'}
 								variant={'bordered'}
 								isInvalid={!!errors.email}
 								{...register('email', { required: 'Почта обязательна' })}
@@ -126,7 +130,7 @@ export const RegisterForm = () => {
 								label='Пароль'
 								register={register}
 								registerName='password'
-								size={'md'}
+								size={'lg'}
 								variant={'bordered'}
 								isInvalid={!!errors.password}
 								rules={{
@@ -138,10 +142,10 @@ export const RegisterForm = () => {
 								}}
 							/>
 							<Button
-								className='full'
+								className='full font-medium'
 								color='primary'
 								type='submit'
-								size='md'
+								size='lg'
 								isLoading={loading}
 							>
 								Зарегистрироваться
@@ -149,8 +153,7 @@ export const RegisterForm = () => {
 						</form>
 					</div>
 				</CardBody>
-				<Divider />
-				<CardFooter className='space-x-2 justify-center'>
+				<CardFooter className='space-x-2 justify-center font-medium'>
 					<p>Уже есть аккаунт?</p>
 					<Link href='/login'>Войти</Link>
 				</CardFooter>

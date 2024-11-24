@@ -1,2 +1,2 @@
 export const NO_INDEX_PAGE = { robots: { index: false, follow: false } }
-export const SITE_NAME = 'va-designer'
+export const SITE_NAME = 'vabase'

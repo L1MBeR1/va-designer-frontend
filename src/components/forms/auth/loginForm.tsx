@@ -6,6 +6,7 @@ import {
 	CardBody,
 	CardFooter,
 	CardHeader,
+	Divider,
 	Input,
 	Link,
 	Spinner
@@ -92,19 +93,22 @@ export const LoginForm = () => {
 			{formLoading ? (
 				<Spinner />
 			) : (
-				<Card className='p-4 w-[400px]'>
+				<Card
+					className='p-6 w-[450px] rounded-2xl'
+					shadow='sm'
+				>
 					<CardHeader className='flex gap-3 justify-center'>
 						<h2 className='text-2xl font-semibold'>Войти в аккаунт</h2>
 					</CardHeader>
-					<CardBody className='space-y-4'>
+					<CardBody className='space-y-6'>
 						{error && <p className='text-danger-600'>{error}</p>}
-						<div className='flex flex-col gap-2'>
+						<div className='flex flex-col gap-3'>
 							<VkButton
-								label='Войти через Vk'
+								label='Войти через Вконтакте'
 								purpose={EnumAuthType.login}
 							/>
 							<YandexButton
-								label='Войти через Yandex'
+								label='Войти через Яндекс'
 								purpose={EnumAuthType.login}
 							/>
 							<GithubButton
@@ -112,14 +116,16 @@ export const LoginForm = () => {
 								purpose={EnumAuthType.login}
 							/>
 						</div>
+						<Divider />
 						<div className='flex flex-col gap-1'>
 							<form
-								className='flex flex-col gap-3'
+								className='flex flex-col gap-4'
 								onSubmit={handleSubmit(onSubmit)}
 							>
 								<Input
 									label='Почта'
-									size={'md'}
+									size={'lg'}
+									// placeholder='Введите почту'
 									variant={'bordered'}
 									isInvalid={!!errors.email}
 									{...register('email', { required: 'Почта обязательна' })}
@@ -128,7 +134,8 @@ export const LoginForm = () => {
 									label='Пароль'
 									register={register}
 									registerName='password'
-									size={'md'}
+									// placeholder='Введите пароль'
+									size={'lg'}
 									variant={'bordered'}
 									isInvalid={!!errors.password}
 									rules={{
@@ -140,10 +147,11 @@ export const LoginForm = () => {
 									}}
 								/>
 								<Button
-									className='full'
+									radius='full'
+									className='full font-medium'
 									color='primary'
 									type='submit'
-									size='md'
+									size='lg'
 									isLoading={loading}
 								>
 									Войти
@@ -151,7 +159,7 @@ export const LoginForm = () => {
 							</form>
 						</div>
 					</CardBody>
-					<CardFooter className='space-x-2 justify-center'>
+					<CardFooter className='space-x-2 justify-center font-medium'>
 						<p>Нет аккаунта?</p>
 						<Link href='/register'>Создать</Link>
 					</CardFooter>

@@ -43,6 +43,8 @@ export const VkButton = ({ label, purpose }: IVkButtonProps) => {
 	}
 	return (
 		<Button
+			radius='full'
+			className='font-medium'
 			onClick={handleLoginVk}
 			startContent={
 				<VK
