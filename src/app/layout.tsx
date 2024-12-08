@@ -14,9 +14,9 @@ const openSans = Open_Sans({
 })
 
 const montserrat = Montserrat({
-	subsets: ['latin'],
+	subsets: ['latin', 'latin-ext'],
 	variable: '--font-montserrat',
-	weight: ['500', '600', '700', '800', '900'],
+	weight: ['400', '500', '600', '700', '800', '900'],
 	display: 'swap'
 })
 

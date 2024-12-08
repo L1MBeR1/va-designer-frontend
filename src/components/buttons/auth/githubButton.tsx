@@ -9,14 +9,19 @@ import { authService } from '@/services/auth.service'
 interface IGithubButtonProps {
 	label: string
 	purpose: EnumAuthType
+	setLoading: (isLoading: boolean) => void
 }
 
-export const GithubButton = ({ label, purpose }: IGithubButtonProps) => {
+export const GithubButton = ({
+	label,
+	purpose,
+	setLoading
+}: IGithubButtonProps) => {
 	const { mutate } = useMutation({
 		mutationKey: ['pkce'],
 		mutationFn: () => authService.pkce(),
 		onMutate() {
-			// setLoading(true)
+			setLoading(true)
 		},
 		onSuccess(response) {
 			const { state } = response.data
@@ -33,7 +38,7 @@ export const GithubButton = ({ label, purpose }: IGithubButtonProps) => {
 			window.location.href = url
 		},
 		onSettled() {
-			// setLoading(false)
+			setLoading(false)
 		}
 	})
 

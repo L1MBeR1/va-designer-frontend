@@ -55,7 +55,7 @@ export function Header() {
 				<NavbarContent className='w-fit'>
 					<NavbarBrand
 						className={`w-fit transition-all items-center ${
-							hasScrolled ? 'gap-4' : 'gap-7'
+							hasScrolled ? 'gap-3' : 'gap-6'
 						}`}
 						onClick={() => {
 							push(APP_PAGES.HOME)
@@ -72,7 +72,7 @@ export function Header() {
 									? 'fill-primary  mt-[-5px]'
 									: 'fill-white  mt-[-5px]'
 							}`}
-							height={hasScrolled ? '30' : '35'}
+							height={hasScrolled ? '26' : '35'}
 						/>
 					</NavbarBrand>
 				</NavbarContent>
@@ -88,7 +88,7 @@ export function Header() {
 								push(APP_PAGES.LOGIN)
 							}}
 						>
-							Вход
+							Войти
 						</Button>
 					</NavbarItem>
 				</NavbarContent>

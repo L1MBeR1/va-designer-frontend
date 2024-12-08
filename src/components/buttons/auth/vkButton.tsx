@@ -9,14 +9,15 @@ import { authService } from '@/services/auth.service'
 interface IVkButtonProps {
 	label: string
 	purpose: EnumAuthType
+	setLoading: (isLoading: boolean) => void
 }
 
-export const VkButton = ({ label, purpose }: IVkButtonProps) => {
+export const VkButton = ({ label, purpose, setLoading }: IVkButtonProps) => {
 	const { mutate } = useMutation({
 		mutationKey: ['pkce'],
 		mutationFn: () => authService.pkce(),
 		onMutate() {
-			// setLoading(true)
+			setLoading(true)
 		},
 		onSuccess(response) {
 			const { state, codeVerifier, codeChallenge } = response.data
@@ -34,7 +35,7 @@ export const VkButton = ({ label, purpose }: IVkButtonProps) => {
 			window.location.href = url
 		},
 		onSettled() {
-			// setLoading(false)
+			setLoading(false)
 		}
 	})
 

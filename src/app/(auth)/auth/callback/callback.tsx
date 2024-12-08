@@ -1,5 +1,6 @@
 'use client'
 
+import { Spinner } from '@nextui-org/react'
 import { useMutation } from '@tanstack/react-query'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
@@ -85,6 +86,8 @@ export default function CallBack() {
 	}, [searchParams, mutate, push])
 
 	return (
-		<main className='flex w-screen h-screen items-center justify-center'></main>
+		<main className='flex w-screen h-screen items-center justify-center'>
+			<Spinner />
+		</main>
 	)
 }

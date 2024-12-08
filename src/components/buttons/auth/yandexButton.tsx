@@ -9,14 +9,19 @@ import { authService } from '@/services/auth.service'
 interface IGithubButtonProps {
 	label: string
 	purpose: EnumAuthType
+	setLoading: (isLoading: boolean) => void
 }
 
-export const YandexButton = ({ label, purpose }: IGithubButtonProps) => {
+export const YandexButton = ({
+	label,
+	purpose,
+	setLoading
+}: IGithubButtonProps) => {
 	const { mutate } = useMutation({
 		mutationKey: ['pkce'],
 		mutationFn: () => authService.pkce(),
 		onMutate() {
-			// setLoading(true)
+			setLoading(true)
 		},
 		onSuccess(response) {
 			const { state, codeVerifier, codeChallenge } = response.data
@@ -34,7 +39,7 @@ export const YandexButton = ({ label, purpose }: IGithubButtonProps) => {
 			window.location.href = url
 		},
 		onSettled() {
-			// setLoading(false)
+			setLoading(false)
 		}
 	})
 

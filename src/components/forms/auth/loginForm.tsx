@@ -40,7 +40,7 @@ export const LoginForm = () => {
 		reset,
 		formState: { errors }
 	} = useForm<IAuthForm>()
-	const [loading, setLoading] = useState(false)
+	// const [loading, setLoading] = useState(false)
 	const [formLoading, setFormLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const queryClient = useQueryClient()
@@ -67,7 +67,7 @@ export const LoginForm = () => {
 		mutationKey: ['login'],
 		mutationFn: (data: IAuthForm) => authService.login(data),
 		onMutate() {
-			setLoading(true)
+			setFormLoading(true)
 			setError(null)
 		},
 		onSuccess() {
@@ -80,7 +80,7 @@ export const LoginForm = () => {
 			setError('Ошибка при входе. Проверьте данные.')
 		},
 		onSettled() {
-			setLoading(false)
+			setFormLoading(false)
 		}
 	})
 
@@ -94,10 +94,10 @@ export const LoginForm = () => {
 				<Spinner />
 			) : (
 				<Card
-					className='p-6 w-[450px] rounded-2xl'
+					className='p-7 w-[450px] rounded-[30px] gap-3'
 					shadow='sm'
 				>
-					<CardHeader className='flex gap-3 justify-center'>
+					<CardHeader className='flex justify-center'>
 						<h2 className='text-2xl font-semibold'>Войти в аккаунт</h2>
 					</CardHeader>
 					<CardBody className='space-y-6'>
@@ -106,14 +106,17 @@ export const LoginForm = () => {
 							<VkButton
 								label='Войти через Вконтакте'
 								purpose={EnumAuthType.login}
+								setLoading={setFormLoading}
 							/>
 							<YandexButton
 								label='Войти через Яндекс'
 								purpose={EnumAuthType.login}
+								setLoading={setFormLoading}
 							/>
 							<GithubButton
 								label='Войти через Github'
 								purpose={EnumAuthType.login}
+								setLoading={setFormLoading}
 							/>
 						</div>
 						<Divider />
@@ -152,7 +155,6 @@ export const LoginForm = () => {
 									color='primary'
 									type='submit'
 									size='lg'
-									isLoading={loading}
 								>
 									Войти
 								</Button>
