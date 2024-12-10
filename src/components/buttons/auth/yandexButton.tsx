@@ -10,19 +10,18 @@ interface IGithubButtonProps {
 	label: string
 	purpose: EnumAuthType
 	setLoading: (isLoading: boolean) => void
+	disabled?: boolean
 }
 
 export const YandexButton = ({
 	label,
 	purpose,
-	setLoading
+	setLoading,
+	disabled
 }: IGithubButtonProps) => {
 	const { mutate } = useMutation({
 		mutationKey: ['pkce'],
 		mutationFn: () => authService.pkce(),
-		onMutate() {
-			setLoading(true)
-		},
 		onSuccess(response) {
 			const { state, codeVerifier, codeChallenge } = response.data
 
@@ -38,12 +37,13 @@ export const YandexButton = ({
 			const url = `https://oauth.yandex.ru/authorize?&response_type=code&force_confirm=1&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`
 			window.location.href = url
 		},
-		onSettled() {
+		onError() {
 			setLoading(false)
 		}
 	})
 
 	const handleLoginYandex = async () => {
+		setLoading(true)
 		mutate()
 	}
 	return (
@@ -53,6 +53,7 @@ export const YandexButton = ({
 			onClick={handleLoginYandex}
 			startContent={<Yandex />}
 			variant='bordered'
+			isDisabled={disabled}
 		>
 			{label}
 		</Button>

@@ -50,14 +50,13 @@ export const RegisterForm = () => {
 		},
 		onSuccess() {
 			queryClient.refetchQueries({ queryKey: ['profile'], type: 'active' })
-			toast.success('Успешный вход в аккаунт!')
-			reset()
 			push(APP_PAGES.DASHBOARD.HOME)
+			toast.info('Вам на почту отправлено письмо для повреждения почты.')
+			reset()
+			setLoading(false)
 		},
 		onError(error: any) {
 			setAuthError('Ошибка при входе. Проверьте данные.')
-		},
-		onSettled() {
 			setLoading(false)
 		}
 	})
@@ -75,31 +74,34 @@ export const RegisterForm = () => {
 					shadow='sm'
 				>
 					<CardHeader className='flex justify-center'>
-						<h2 className='text-2xl font-semibold'>Создать аккаунт</h2>
+						<h2 className='text-2xl font-semibold'>Регистрация аккаунта</h2>
 					</CardHeader>
 					<CardBody className='space-y-6'>
 						{authError && <p className='text-danger-600'>{authError}</p>}
 						<div className='flex flex-col gap-3'>
 							<VkButton
-								label='Войти через Вконтакте'
+								label='Продолжить через Вконтакте'
 								purpose={EnumAuthType.login}
-								setLoading={setLoading}
+								setLoading={setFormLoading}
+								disabled={loading}
 							/>
 							<YandexButton
-								label='Войти через Яндекс'
+								label='Продолжить через Яндекс'
 								purpose={EnumAuthType.login}
-								setLoading={setLoading}
+								setLoading={setFormLoading}
+								disabled={loading}
 							/>
 							<GithubButton
-								label='Войти через Github'
+								label='Продолжить через Github'
 								purpose={EnumAuthType.login}
-								setLoading={setLoading}
+								setLoading={setFormLoading}
+								disabled={loading}
 							/>
 						</div>
 						<Divider />
 						<div className='flex flex-col gap-1'>
 							<form
-								className='flex flex-col gap-3'
+								className='flex flex-col gap-4'
 								onSubmit={handleSubmit(onSubmit)}
 							>
 								<Input
@@ -107,6 +109,7 @@ export const RegisterForm = () => {
 									size={'lg'}
 									variant={'bordered'}
 									isInvalid={!!errors.email}
+									isDisabled={loading}
 									{...register('email', { required: 'Почта обязательна' })}
 								/>
 
@@ -117,6 +120,7 @@ export const RegisterForm = () => {
 									size={'lg'}
 									variant={'bordered'}
 									isInvalid={!!errors.password}
+									disabled={loading}
 									rules={{
 										required: 'Пароль обязателен',
 										minLength: {

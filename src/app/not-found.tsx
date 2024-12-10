@@ -22,7 +22,7 @@ export default function NotFound() {
 				<LongLogo />
 			</nav>
 			<section className='flex flex-col items-center justify-center gap-5'>
-				<div className='font-extrabold text-[300px] font-primary text-primary leading-tight'>
+				<div className='font-extrabold text-[300px] font-primary text-primary leading-[15rem]'>
 					404
 				</div>
 				<div className='font-semibold text-xl text-center max-w-[600px]'>

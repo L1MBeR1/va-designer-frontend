@@ -72,7 +72,7 @@ export default function DashBoardSideBar() {
 								isBordered
 								src={data?.image ? data.image : ProfileBlank.src}
 							/>
-							<p className='text-sm'>{data?.email}</p>
+							<p className='text-sm'>{data?.name}</p>
 						</div>
 					</AccountPopover>
 				</div>

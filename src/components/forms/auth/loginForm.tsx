@@ -40,7 +40,7 @@ export const LoginForm = () => {
 		reset,
 		formState: { errors }
 	} = useForm<IAuthForm>()
-	// const [loading, setLoading] = useState(false)
+	const [loading, setLoading] = useState(false)
 	const [formLoading, setFormLoading] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const queryClient = useQueryClient()
@@ -67,20 +67,19 @@ export const LoginForm = () => {
 		mutationKey: ['login'],
 		mutationFn: (data: IAuthForm) => authService.login(data),
 		onMutate() {
-			setFormLoading(true)
+			setLoading(true)
 			setError(null)
 		},
 		onSuccess() {
 			queryClient.refetchQueries({ queryKey: ['profile'], type: 'active' })
+			push(APP_PAGES.DASHBOARD.HOME)
 			toast.success('Успешный вход в аккаунт!')
 			reset()
-			push(APP_PAGES.DASHBOARD.HOME)
+			setLoading(false)
 		},
 		onError(error: any) {
 			setError('Ошибка при входе. Проверьте данные.')
-		},
-		onSettled() {
-			setFormLoading(false)
+			setLoading(false)
 		}
 	})
 
@@ -98,7 +97,7 @@ export const LoginForm = () => {
 					shadow='sm'
 				>
 					<CardHeader className='flex justify-center'>
-						<h2 className='text-2xl font-semibold'>Войти в аккаунт</h2>
+						<h2 className='text-2xl font-semibold'>Вход в аккаунт</h2>
 					</CardHeader>
 					<CardBody className='space-y-6'>
 						{error && <p className='text-danger-600'>{error}</p>}
@@ -107,16 +106,19 @@ export const LoginForm = () => {
 								label='Войти через Вконтакте'
 								purpose={EnumAuthType.login}
 								setLoading={setFormLoading}
+								disabled={loading}
 							/>
 							<YandexButton
 								label='Войти через Яндекс'
 								purpose={EnumAuthType.login}
 								setLoading={setFormLoading}
+								disabled={loading}
 							/>
 							<GithubButton
 								label='Войти через Github'
 								purpose={EnumAuthType.login}
 								setLoading={setFormLoading}
+								disabled={loading}
 							/>
 						</div>
 						<Divider />
@@ -131,30 +133,41 @@ export const LoginForm = () => {
 									// placeholder='Введите почту'
 									variant={'bordered'}
 									isInvalid={!!errors.email}
+									isDisabled={loading}
 									{...register('email', { required: 'Почта обязательна' })}
 								/>
-								<PasswordField
-									label='Пароль'
-									register={register}
-									registerName='password'
-									// placeholder='Введите пароль'
-									size={'lg'}
-									variant={'bordered'}
-									isInvalid={!!errors.password}
-									rules={{
-										required: 'Пароль обязателен',
-										minLength: {
-											value: 6,
-											message: 'Пароль должен содержать минимум 6 символов'
-										}
-									}}
-								/>
+								<div className='flex flex-col space-y-3'>
+									<PasswordField
+										label='Пароль'
+										register={register}
+										registerName='password'
+										// placeholder='Введите пароль'
+										size={'lg'}
+										variant={'bordered'}
+										isInvalid={!!errors.password}
+										disabled={loading}
+										rules={{
+											required: 'Пароль обязателен',
+											minLength: {
+												value: 6,
+												message: 'Пароль должен содержать минимум 6 символов'
+											}
+										}}
+									/>
+									<Link
+										className='text-sm pl-3'
+										href='/recovery'
+									>
+										Забыли пароль?
+									</Link>
+								</div>
 								<Button
 									radius='full'
 									className='full font-medium'
 									color='primary'
 									type='submit'
 									size='lg'
+									isLoading={loading}
 								>
 									Войти
 								</Button>

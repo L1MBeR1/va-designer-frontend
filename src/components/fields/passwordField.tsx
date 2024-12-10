@@ -16,6 +16,7 @@ interface IPasswordInputProps {
 	rules?: RegisterOptions
 	isInvalid?: boolean
 	errorMessage?: string
+	disabled?: boolean
 }
 
 export function PasswordField({
@@ -27,7 +28,8 @@ export function PasswordField({
 	registerName,
 	rules,
 	isInvalid,
-	errorMessage
+	errorMessage,
+	disabled
 }: IPasswordInputProps) {
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
@@ -43,6 +45,7 @@ export function PasswordField({
 				type={isPasswordVisible ? 'text' : 'password'}
 				variant={variant}
 				size={size}
+				isDisabled={disabled}
 				endContent={
 					<Button
 						isIconOnly

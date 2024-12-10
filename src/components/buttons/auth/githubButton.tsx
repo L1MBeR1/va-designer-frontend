@@ -10,19 +10,19 @@ interface IGithubButtonProps {
 	label: string
 	purpose: EnumAuthType
 	setLoading: (isLoading: boolean) => void
+	disabled?: boolean
 }
 
 export const GithubButton = ({
 	label,
 	purpose,
-	setLoading
+	setLoading,
+	disabled
 }: IGithubButtonProps) => {
 	const { mutate } = useMutation({
 		mutationKey: ['pkce'],
 		mutationFn: () => authService.pkce(),
-		onMutate() {
-			setLoading(true)
-		},
+
 		onSuccess(response) {
 			const { state } = response.data
 
@@ -37,12 +37,13 @@ export const GithubButton = ({
 			const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email&state=${state}&redirect_uri=${redirectUri}`
 			window.location.href = url
 		},
-		onSettled() {
+		onError() {
 			setLoading(false)
 		}
 	})
 
 	const handleLoginGitHub = async () => {
+		setLoading(true)
 		mutate()
 	}
 	return (
@@ -57,6 +58,7 @@ export const GithubButton = ({
 				/>
 			}
 			variant='bordered'
+			isDisabled={disabled}
 		>
 			{label}
 		</Button>

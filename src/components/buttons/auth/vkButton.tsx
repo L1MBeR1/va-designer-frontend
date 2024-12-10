@@ -10,15 +10,18 @@ interface IVkButtonProps {
 	label: string
 	purpose: EnumAuthType
 	setLoading: (isLoading: boolean) => void
+	disabled?: boolean
 }
 
-export const VkButton = ({ label, purpose, setLoading }: IVkButtonProps) => {
+export const VkButton = ({
+	label,
+	purpose,
+	setLoading,
+	disabled
+}: IVkButtonProps) => {
 	const { mutate } = useMutation({
 		mutationKey: ['pkce'],
 		mutationFn: () => authService.pkce(),
-		onMutate() {
-			setLoading(true)
-		},
 		onSuccess(response) {
 			const { state, codeVerifier, codeChallenge } = response.data
 
@@ -34,12 +37,13 @@ export const VkButton = ({ label, purpose, setLoading }: IVkButtonProps) => {
 			const url = `https://id.vk.com/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256&scope=email`
 			window.location.href = url
 		},
-		onSettled() {
+		onError() {
 			setLoading(false)
 		}
 	})
 
 	const handleLoginVk = async () => {
+		setLoading(true)
 		mutate()
 	}
 	return (
@@ -54,6 +58,7 @@ export const VkButton = ({ label, purpose, setLoading }: IVkButtonProps) => {
 				/>
 			}
 			variant='bordered'
+			isDisabled={disabled}
 		>
 			{label}
 		</Button>

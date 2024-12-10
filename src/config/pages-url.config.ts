@@ -7,6 +7,7 @@ class PAGES {
 	// Страницы авторизации
 	LOGIN = '/login'
 	REGISTER = '/register'
+	RECOVERY = '/recovery'
 
 	// Страницы дешборда
 	DASHBOARD = {
