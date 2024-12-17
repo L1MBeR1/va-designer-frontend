@@ -1,8 +1,5 @@
 'use client'
 
-import Github from '/public/svgs/githubLogo.svg'
-import VK from '/public/svgs/vkLogo.svg'
-import Yandex from '/public/svgs/yandexLogo.svg'
 import {
 	Button,
 	Card,
@@ -11,7 +8,8 @@ import {
 	CardHeader,
 	Divider,
 	Input,
-	Link
+	Link,
+	Spinner
 } from '@nextui-org/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
@@ -19,9 +17,12 @@ import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+import { GithubButton } from '@/components/buttons/auth/githubButton'
+import { VkButton } from '@/components/buttons/auth/vkButton'
+import { YandexButton } from '@/components/buttons/auth/yandexButton'
 import { PasswordField } from '@/components/fields/passwordField'
 
-import { IAuthForm } from '@/types/auth.types'
+import { EnumAuthType, IAuthForm } from '@/types/auth.types'
 
 import { APP_PAGES } from '@/config/pages-url.config'
 
@@ -38,14 +39,8 @@ export const RegisterForm = () => {
 	const [authError, setAuthError] = useState<string | null>(null)
 	const queryClient = useQueryClient()
 	const { push } = useRouter()
+	const [formLoading, setFormLoading] = useState(false)
 
-	const handleLogin = () => {
-		const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
-
-		const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email`
-
-		window.location.href = githubAuthUrl
-	}
 	const { mutate } = useMutation({
 		mutationKey: ['register'],
 		mutationFn: (data: IAuthForm) => authService.register(data),
@@ -54,15 +49,14 @@ export const RegisterForm = () => {
 			setAuthError(null)
 		},
 		onSuccess() {
-			toast.success('Успешный вход в аккаунт!')
-			reset()
-			push(APP_PAGES.DASHBOARD.HOME)
 			queryClient.refetchQueries({ queryKey: ['profile'], type: 'active' })
+			push(APP_PAGES.DASHBOARD.HOME)
+			toast.info('Вам на почту отправлено письмо для повреждения почты.')
+			reset()
+			setLoading(false)
 		},
 		onError(error: any) {
 			setAuthError('Ошибка при входе. Проверьте данные.')
-		},
-		onSettled() {
 			setLoading(false)
 		}
 	})
@@ -72,89 +66,88 @@ export const RegisterForm = () => {
 	}
 	return (
 		<div className='w-fit h-fit '>
-			<Card className='p-4 w-[400px]'>
-				<CardHeader className='flex gap-3 justify-center'>
-					<h2 className='text-2xl font-semibold'>Cоздать аккаунт</h2>
-				</CardHeader>
-				<CardBody className='space-y-4'>
-					{authError && <p className='text-danger-600'>{authError}</p>}
-					<div className='flex flex-col gap-2'>
-						<Button
-							startContent={
-								<VK
-									width='25'
-									height='25'
-								/>
-							}
-							variant='bordered'
-						>
-							Продолжить через Vk
-						</Button>
-						<Button
-							startContent={<Yandex />}
-							variant='bordered'
-						>
-							Продолжить через Яндекс
-						</Button>
-						<Button
-							onClick={handleLogin}
-							startContent={
-								<Github
-									width='25'
-									height='25'
-								/>
-							}
-							variant='bordered'
-						>
-							Продолжить через Github
-						</Button>
-					</div>
-					<div className='flex flex-col gap-1'>
-						<form
-							className='flex flex-col gap-3'
-							onSubmit={handleSubmit(onSubmit)}
-						>
-							<Input
-								label='Почта'
-								size={'md'}
-								variant={'bordered'}
-								isInvalid={!!errors.email}
-								{...register('email', { required: 'Почта обязательна' })}
+			{formLoading ? (
+				<Spinner />
+			) : (
+				<Card
+					className='p-7 w-[450px] rounded-[30px] gap-3'
+					shadow='sm'
+				>
+					<CardHeader className='flex justify-center'>
+						<h2 className='text-2xl font-semibold'>Регистрация аккаунта</h2>
+					</CardHeader>
+					<CardBody className='space-y-6'>
+						{authError && <p className='text-danger-600'>{authError}</p>}
+						<div className='flex flex-col gap-3'>
+							<VkButton
+								label='Продолжить через Вконтакте'
+								purpose={EnumAuthType.login}
+								setLoading={setFormLoading}
+								disabled={loading}
 							/>
-
-							<PasswordField
-								label='Пароль'
-								register={register}
-								registerName='password'
-								size={'md'}
-								variant={'bordered'}
-								isInvalid={!!errors.password}
-								rules={{
-									required: 'Пароль обязателен',
-									minLength: {
-										value: 6,
-										message: 'Пароль должен содержать минимум 6 символов'
-									}
-								}}
+							<YandexButton
+								label='Продолжить через Яндекс'
+								purpose={EnumAuthType.login}
+								setLoading={setFormLoading}
+								disabled={loading}
 							/>
-							<Button
-								className='full'
-								color='primary'
-								type='submit'
-								size='md'
-								isLoading={loading}
+							<GithubButton
+								label='Продолжить через Github'
+								purpose={EnumAuthType.login}
+								setLoading={setFormLoading}
+								disabled={loading}
+							/>
+						</div>
+						<Divider />
+						<div className='flex flex-col gap-1'>
+							<form
+								className='flex flex-col gap-4'
+								onSubmit={handleSubmit(onSubmit)}
 							>
-								Зарегистрироваться
-							</Button>
-						</form>
-					</div>
-				</CardBody>
-				<Divider />
-				<CardFooter className='space-x-2 justify-center'>
-					<p>Уже есть аккаунт?</p>
-					<Link href='/login'>Войти</Link>
-				</CardFooter>
-			</Card>
+								<Input
+									label='Почта'
+									size={'lg'}
+									variant={'bordered'}
+									isInvalid={!!errors.email}
+									isDisabled={loading}
+									{...register('email', { required: 'Почта обязательна' })}
+								/>
+
+								<PasswordField
+									label='Пароль'
+									register={register}
+									registerName='password'
+									size={'lg'}
+									variant={'bordered'}
+									isInvalid={!!errors.password}
+									disabled={loading}
+									rules={{
+										required: 'Пароль обязателен',
+										minLength: {
+											value: 6,
+											message: 'Пароль должен содержать минимум 6 символов'
+										}
+									}}
+								/>
+								<Button
+									className='full font-medium'
+									color='primary'
+									radius='full'
+									type='submit'
+									size='lg'
+									isLoading={loading}
+								>
+									Зарегистрироваться
+								</Button>
+							</form>
+						</div>
+					</CardBody>
+					<CardFooter className='space-x-2 justify-center font-medium'>
+						<p>Уже есть аккаунт?</p>
+						<Link href='/login'>Войти</Link>
+					</CardFooter>
+				</Card>
+			)}
 		</div>
 	)
 }
